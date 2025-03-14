@@ -1,0 +1,56 @@
+import time  # Para simular la lectura del sensor cada 5 segundos
+
+class SensorTemperatura:
+    def leer_temperatura(self):
+        # Simula la lectura de la temperatura
+        temperatura = float(input("Ingrese la temperatura actual del invernadero (°C): "))
+        return temperatura
+
+class ControladorTemperatura:
+    def procesar_temperatura(self, temperatura):
+        if temperatura < 10:
+            return "Calefactor activado"
+        elif 10 <= temperatura <= 25:
+            return "Sistema inactivo"
+        else:
+            return "Ventilador activado"
+
+class Invernadero:
+    def __init__(self):
+        self.sensor = SensorTemperatura()
+        self.controlador = ControladorTemperatura()
+
+    def simular_control(self):
+        try:
+            while True:  # Bucle para simular la lectura continua del sensor
+                temperatura = self.sensor.leer_temperatura()
+                estado = self.controlador.procesar_temperatura(temperatura)
+                print(f"Estado del sistema: {estado}")
+                time.sleep(5)  # Simula la lectura cada 5 segundos
+        except KeyboardInterrupt:  # Permite salir del bucle con Ctrl+C
+            print("Simulación detenida. Volviendo al menú...")
+
+class InterfazUsuario:
+    def mostrar_menu(self):
+        print("Bienvenido al Control de Temperatura en un Invernadero")
+        print("1. Simular control de temperatura")
+        print("2. Salir")
+
+    def iniciar(self):
+        invernadero = Invernadero()
+        while True:
+            self.mostrar_menu()
+            opcion = input("Seleccione una opción: ")
+
+            if opcion == "1":
+                invernadero.simular_control()
+            elif opcion == "2":
+                print("Gracias por usar el sistema de control de temperatura. ¡Hasta luego!")
+                break
+            else:
+                print("Opción no válida. Intente de nuevo.")
+
+# Ejecutar el sistema
+if __name__ == "__main__":
+    interfaz = InterfazUsuario()
+    interfaz.iniciar()
