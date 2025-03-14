@@ -1,0 +1,75 @@
+import random
+import time
+import threading
+
+class Sensor:
+    def __init__(self, nombre):
+        self.nombre = nombre
+
+    def leer_estado(self):
+        # Simula el estado del sensor de manera aleatoria
+        return random.choice([True, False])
+
+class ControlLuces:
+    def __init__(self):
+        self.sensor_noche = Sensor("Sensor de Noche")
+        self.sensor_movimiento = Sensor("Sensor de Movimiento")
+        self.luces_encendidas = False
+        self.modo_automatico = True  # Modo automático activado por defecto
+
+    def encender_luces(self):
+        self.luces_encendidas = True
+        print("Luces encendidas.")
+
+    def apagar_luces(self):
+        self.luces_encendidas = False
+        print("Luces apagadas.")
+
+    def simular_control(self):
+        while self.modo_automatico:
+            es_noche = self.sensor_noche.leer_estado()
+            hay_movimiento = self.sensor_movimiento.leer_estado()
+
+            print("\n--- Nueva lectura de sensores ---")
+            print(f"Es de noche: {'Sí' if es_noche else 'No'}")
+            print(f"Hay movimiento: {'Sí' if hay_movimiento else 'No'}")
+
+            if es_noche and hay_movimiento:
+                self.encender_luces()
+            else:
+                self.apagar_luces()
+
+            # Esperar 10 segundos antes de la siguiente lectura
+            time.sleep(10)
+
+class InterfazUsuario:
+    def mostrar_menu(self):
+        print("\nBienvenido al Sistema de Control de Luces Automático")
+        print("1. Activar/Desactivar modo automático")
+        print("2. Salir")
+
+    def iniciar(self):
+        sistema = ControlLuces()
+
+        # Iniciar la simulación de control en segundo plano
+        hilo_simulacion = threading.Thread(target=sistema.simular_control, daemon=True)
+        hilo_simulacion.start()
+
+        while True:
+            self.mostrar_menu()
+            opcion = input("Seleccione una opción: ").strip()
+
+            if opcion == "1":
+                sistema.modo_automatico = not sistema.modo_automatico
+                estado = "activado" if sistema.modo_automatico else "desactivado"
+                print(f"Modo automático {estado}.")
+            elif opcion == "2":
+                print("Gracias por usar el sistema de control de luces. ¡Hasta luego!")
+                break
+            else:
+                print("Opción no válida. Intente de nuevo.")
+
+# Ejecutar el sistema
+if __name__ == "__main__":
+    interfaz = InterfazUsuario()
+    interfaz.iniciar()
