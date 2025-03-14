@@ -1,0 +1,70 @@
+import random
+import time
+import threading
+
+class Cliente:
+    def __init__(self):
+        self.tiene_membresia = random.choice([True, False])
+        self.es_empleado = random.choice([True, False])
+
+class HorarioAtencion:
+    def __init__(self):
+        self.horario_activo = random.choice([True, False])
+
+class ControlAcceso:
+    def __init__(self):
+        self.modo_automatico = True  # Modo automático activado por defecto
+
+    def verificar_acceso(self, cliente, horario):
+        if (cliente.tiene_membresia and horario.horario_activo) or cliente.es_empleado:
+            return "Acceso permitido"
+        else:
+            return "Acceso denegado"
+
+    def simular_control(self):
+        while self.modo_automatico:
+            cliente = Cliente()
+            horario = HorarioAtencion()
+
+            print("\n--- Nueva verificación de acceso ---")
+            print(f"Cliente tiene membresía: {'Sí' if cliente.tiene_membresia else 'No'}")
+            print(f"Cliente es empleado: {'Sí' if cliente.es_empleado else 'No'}")
+            print(f"Horario de atención activo: {'Sí' if horario.horario_activo else 'No'}")
+
+            resultado = self.verificar_acceso(cliente, horario)
+            print(f"Resultado: {resultado}")
+
+            # Esperar 5 segundos antes de la siguiente verificación
+            time.sleep(5)
+
+class InterfazUsuario:
+    def mostrar_menu(self):
+        print("\nBienvenido al Sistema de Control de Acceso a la Tienda")
+        print("1. Activar/Desactivar modo automático")
+        print("2. Salir")
+
+    def iniciar(self):
+        sistema = ControlAcceso()
+
+        # Iniciar la simulación de control en segundo plano
+        hilo_simulacion = threading.Thread(target=sistema.simular_control, daemon=True)
+        hilo_simulacion.start()
+
+        while True:
+            self.mostrar_menu()
+            opcion = input("Seleccione una opción: ").strip()
+
+            if opcion == "1":
+                sistema.modo_automatico = not sistema.modo_automatico
+                estado = "activado" if sistema.modo_automatico else "desactivado"
+                print(f"Modo automático {estado}.")
+            elif opcion == "2":
+                print("Gracias por usar el sistema de control de acceso. ¡Hasta luego!")
+                break
+            else:
+                print("Opción no válida. Intente de nuevo.")
+
+# Ejecutar el sistema
+if __name__ == "__main__":
+    interfaz = InterfazUsuario()
+    interfaz.iniciar()
