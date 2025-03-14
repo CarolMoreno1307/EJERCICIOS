@@ -1,0 +1,76 @@
+class Asiento:
+    def _init_(self, numero):
+        self.numero = numero
+        self.reservado = False
+
+    def reservar(self):
+        if not self.reservado:
+            self.reservado = True
+            return True
+        return False
+
+    def liberar(self):
+        if self.reservado:
+            self.reservado = False
+            return True
+        return False
+
+class Sala:
+    def _init_(self, capacidad):
+        self.capacidad = capacidad
+        self.asientos = [Asiento(i) for i in range(1, capacidad + 1)]
+
+    def mostrar_asientos(self):
+        for asiento in self.asientos:
+            estado = "Reservado" if asiento.reservado else "Disponible"
+            print(f"Asiento {asiento.numero}: {estado}")
+
+    def reservar_asiento(self, numero):
+        for asiento in self.asientos:
+            if asiento.numero == numero:
+                if asiento.reservar():
+                    return True
+                else:
+                    return False
+        return False
+
+    def asientos_disponibles(self):
+        return sum(1 for asiento in self.asientos if not asiento.reservado)
+
+class Reserva:
+    def _init_(self, usuario, asiento):
+        self.usuario = usuario
+        self.asiento = asiento
+
+    def confirmar_reserva(self):
+        if self.asiento.reservar():
+            return True
+        return False
+
+class SistemaReservas:
+    def _init_(self):
+        self.salas = []
+
+    def agregar_sala(self, sala):
+        self.salas.append(sala)
+
+    def reservar_asiento(self, sala_id, asiento_numero, usuario):
+        if sala_id < len(self.salas):
+            sala = self.salas[sala_id]
+            if sala.reservar_asiento(asiento_numero):
+                reserva = Reserva(usuario, sala.asientos[asiento_numero - 1])
+                return reserva.confirmar_reserva()
+        return False
+
+    def mostrar_estado_salas(self):
+        for i, sala in enumerate(self.salas):
+            print(f"Sala {i}:")
+            sala.mostrar_asientos()
+
+# Ejemplo de uso
+sistema = SistemaReservas()
+sala1 = Sala(10)
+sistema.agregar_sala(sala1)
+
+sistema.reservar_asiento(0, 5, "Juan")
+sistema.mostrar_estado_salas()
