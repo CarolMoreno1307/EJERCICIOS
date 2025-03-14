@@ -1,0 +1,96 @@
+import random
+import time
+
+class SensorMovimiento:
+    def __init__(self, nombre):
+        self.nombre = nombre
+
+    def leer_sensor(self):
+        # Simula la detección de movimiento de manera aleatoria
+        return random.choice([True, False])
+
+class SistemaAlarma:
+    def __init__(self):
+        self.activa = True  # Estado inicial de la alarma
+
+    def activar(self):
+        self.activa = True
+        print("Alarma activada.")
+
+    def desactivar(self):
+        self.activa = False
+        print("Alarma desactivada.")
+
+    def esta_activa(self):
+        return self.activa
+
+class DeteccionIntrusos:
+    def __init__(self):
+        self.sensor1 = SensorMovimiento("Sensor 1")
+        self.sensor2 = SensorMovimiento("Sensor 2")
+        self.sensor3 = SensorMovimiento("Sensor 3")
+        self.alarma = SistemaAlarma()
+        self.es_noche = True  # Simula si es de noche o no
+
+    def simular_deteccion(self):
+        while True:
+            # Simular si es de noche o no de manera aleatoria
+            self.es_noche = random.choice([True, False])
+            print("\n--- Nueva lectura de sensores ---")
+            print(f"Es de noche: {'Sí' if self.es_noche else 'No'}")
+
+            # Leer los sensores
+            sensor1 = self.sensor1.leer_sensor()
+            sensor2 = self.sensor2.leer_sensor()
+            sensor3 = self.sensor3.leer_sensor()
+
+            print(f"Sensor 1: {'Movimiento detectado' if sensor1 else 'Sin movimiento'}")
+            print(f"Sensor 2: {'Movimiento detectado' if sensor2 else 'Sin movimiento'}")
+            print(f"Sensor 3: {'Movimiento detectado' if sensor3 else 'Sin movimiento'}")
+
+            # Procesar los datos de los sensores
+            if self.es_noche and self.alarma.esta_activa():
+                sensores_activados = sum([sensor1, sensor2, sensor3])
+                if sensores_activados >= 2:
+                    print("¡Alarma activada! Intruso detectado.")
+                else:
+                    print("Alarma inactiva. No se detectó intrusión.")
+            else:
+                print("Alarma inactiva. No es de noche o la alarma está desactivada.")
+
+            # Esperar 5 segundos antes de la siguiente lectura
+            time.sleep(5)
+
+class InterfazUsuario:
+    def mostrar_menu(self):
+        print("\nBienvenido al Sistema de Detección de Intrusos")
+        print("1. Activar/Desactivar la alarma")
+        print("2. Salir")
+
+    def iniciar(self):
+        sistema = DeteccionIntrusos()
+
+        # Iniciar la simulación de detección en segundo plano
+        import threading
+        hilo_simulacion = threading.Thread(target=sistema.simular_deteccion, daemon=True)
+        hilo_simulacion.start()
+
+        while True:
+            self.mostrar_menu()
+            opcion = input("Seleccione una opción: ").strip()
+
+            if opcion == "1":
+                if sistema.alarma.esta_activa():
+                    sistema.alarma.desactivar()
+                else:
+                    sistema.alarma.activar()
+            elif opcion == "2":
+                print("Gracias por usar el sistema de detección de intrusos. ¡Hasta luego!")
+                break
+            else:
+                print("Opción no válida. Intente de nuevo.")
+
+# Ejecutar el sistema
+if __name__ == "__main__":
+    interfaz = InterfazUsuario()
+    interfaz.iniciar()
