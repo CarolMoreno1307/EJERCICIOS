@@ -1,0 +1,77 @@
+import random
+import time
+import threading
+
+class Sensor:
+    def __init__(self, nombre, rango_min, rango_max):
+        self.nombre = nombre
+        self.rango_min = rango_min
+        self.rango_max = rango_max
+
+    def leer_estado(self):
+        # Simula la lectura del sensor dentro de un rango específico
+        return random.uniform(self.rango_min, self.rango_max)
+
+class ControlAireAcondicionado:
+    def __init__(self):
+        self.sensor_temperatura = Sensor("Temperatura", 20, 35)  # Rango de temperatura: 20°C a 35°C
+        self.sensor_humedad = Sensor("Humedad", 30, 80)  # Rango de humedad: 30% a 80%
+        self.aire_encendido = False
+        self.modo_automatico = True  # Modo automático activado por defecto
+
+    def encender_aire(self):
+        self.aire_encendido = True
+        print("Aire acondicionado encendido.")
+
+    def apagar_aire(self):
+        self.aire_encendido = False
+        print("Aire acondicionado apagado.")
+
+    def simular_control(self):
+        while self.modo_automatico:
+            temperatura = self.sensor_temperatura.leer_estado()
+            humedad = self.sensor_humedad.leer_estado()
+
+            print("\n--- Nueva lectura de sensores ---")
+            print(f"Temperatura: {temperatura:.2f}°C")
+            print(f"Humedad: {humedad:.2f}%")
+
+            if (temperatura > 28 and humedad > 60) or temperatura > 30:
+                self.encender_aire()
+            else:
+                self.apagar_aire()
+
+            # Esperar 10 segundos antes de la siguiente lectura
+            time.sleep(10)
+
+class InterfazUsuario:
+    def mostrar_menu(self):
+        print("\nBienvenido al Sistema de Control de Aire Acondicionado")
+        print("1. Activar/Desactivar modo automático")
+        print("2. Salir")
+
+    def iniciar(self):
+        sistema = ControlAireAcondicionado()
+
+        # Iniciar la simulación de control en segundo plano
+        hilo_simulacion = threading.Thread(target=sistema.simular_control, daemon=True)
+        hilo_simulacion.start()
+
+        while True:
+            self.mostrar_menu()
+            opcion = input("Seleccione una opción: ").strip()
+
+            if opcion == "1":
+                sistema.modo_automatico = not sistema.modo_automatico
+                estado = "activado" if sistema.modo_automatico else "desactivado"
+                print(f"Modo automático {estado}.")
+            elif opcion == "2":
+                print("Gracias por usar el sistema de control de aire acondicionado. ¡Hasta luego!")
+                break
+            else:
+                print("Opción no válida. Intente de nuevo.")
+
+# Ejecutar el sistema
+if __name__ == "__main__":
+    interfaz = InterfazUsuario()
+    interfaz.iniciar()
